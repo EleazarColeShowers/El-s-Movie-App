@@ -4,30 +4,45 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.elsmovieapp.model.OnboardingPage
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
+import kotlinx.coroutines.launch
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,17 +72,35 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Onboarding(modifier: Modifier){
     val black= colorResource(id=R.color.black)
+    val cyan= colorResource(id= R.color.cyan)
+    val coroutineScope = rememberCoroutineScope()
+    val pages = listOf(
+        OnboardingPage(R.drawable.firstonboarding, "Offers ad-free viewing of high quality", "Watch your movies without interruptions"),
+        OnboardingPage(R.drawable.secondonboarding, "Be Up-To-Date", "Keep track of the latest movies"),
+        OnboardingPage(R.drawable.thirdonboarding, "Our service brings together your favorite series", "All of your favorite series and movies, in one place")
+    )
+    val pagerState = rememberPagerState(pageCount = { pages.size })
+
     Column(
-        Modifier.fillMaxSize() ,
+        Modifier
+            .fillMaxSize()
+            .padding(top = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(R.drawable.firstonboarding),
-            contentDescription = "first image",
-            modifier = Modifier.fillMaxWidth(0.9f)
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
                 .height(399.dp)
-                .padding(top = 59.dp),
-        )
+        ) { page ->
+            Image(
+                painter = painterResource(pages[page].image),
+                contentDescription = "Onboarding Image",
+                modifier.fillMaxSize(),
+                contentScale = Crop
+            )
+        }
+
         Spacer(modifier = Modifier.weight(1f))
 
         Card(
@@ -76,15 +109,69 @@ fun Onboarding(modifier: Modifier){
                 .height(371.dp)
                 .padding(bottom = 40.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = black
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            )
+            colors = CardDefaults.cardColors(containerColor = black),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = pages[pagerState.currentPage].title,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = pages[pagerState.currentPage].description,
+                    fontSize = 16.sp,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.next),
+                        contentDescription = "Next",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clickable {
+                                coroutineScope.launch {
+                                    val nextPage = pagerState.currentPage + 1
+                                    if (nextPage < pages.size) {
+                                        pagerState.animateScrollToPage(nextPage)
+                                    }
+                                }
+                            },
+                        tint = Color.Unspecified
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        repeat(pages.size) { index ->
+                            val isSelected = pagerState.currentPage == index
+                            Box(
+                                modifier = Modifier
+                                    .height(10.dp)
+                                    .width(if (isSelected) 32.dp else 10.dp)
+                                    .padding(2.dp)
+                                    .background(
+                                        color = if (isSelected) cyan else cyan.copy(alpha = 0.4f),
+                                        shape = RoundedCornerShape(50)
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
         }
-
-
     }
 }
