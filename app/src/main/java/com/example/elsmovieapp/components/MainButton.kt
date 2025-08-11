@@ -35,7 +35,7 @@ fun MainButton(
             containerColor = cyan,
             contentColor = Color.White
         ),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(24.dp)
     ) {
         Text(
             text = text,

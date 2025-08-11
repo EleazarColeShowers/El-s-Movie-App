@@ -1,5 +1,6 @@
 package com.example.elsmovieapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,8 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,7 +32,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.elsmovieapp.model.OnboardingPage
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import kotlinx.coroutines.launch
+import kotlin.jvm.java
 
 
 class MainActivity : ComponentActivity() {
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
 fun Onboarding(modifier: Modifier){
     val black= colorResource(id=R.color.black)
     val cyan= colorResource(id= R.color.cyan)
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf(
         OnboardingPage(R.drawable.firstonboarding, "Offers ad-free viewing of high quality", "Watch your movies without interruptions"),
@@ -93,12 +95,17 @@ fun Onboarding(modifier: Modifier){
                 .fillMaxWidth(0.9f)
                 .height(399.dp)
         ) { page ->
-            Image(
-                painter = painterResource(pages[page].image),
-                contentDescription = "Onboarding Image",
-                modifier.fillMaxSize(),
-                contentScale = Crop
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(pages[page].image),
+                    contentDescription = "Onboarding Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -147,6 +154,13 @@ fun Onboarding(modifier: Modifier){
                                     val nextPage = pagerState.currentPage + 1
                                     if (nextPage < pages.size) {
                                         pagerState.animateScrollToPage(nextPage)
+                                    } else {
+                                        context.startActivity(
+                                            Intent(
+                                                context,
+                                                Splash::class.java
+                                            )
+                                        )
                                     }
                                 }
                             },
