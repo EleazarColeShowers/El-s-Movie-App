@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Splash"/>
+        <activity android:name=".authUI.SignUpActivity"/>
     </application>
 
 </manifest>

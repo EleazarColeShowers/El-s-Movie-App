@@ -1,5 +1,6 @@
 package com.example.elsmovieapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,6 +33,13 @@ import com.example.elsmovieapp.components.MainButton
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import com.example.elsmovieapp.authUI.SignUpActivity
 
 class Splash : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +98,17 @@ fun SplashScreen(modifier: Modifier) {
 
 @Composable
 fun SplashPage(){
+    val context= LocalContext.current
+    val annotatedText = buildAnnotatedString {
+        append("I already have an account? ")
+
+        pushStringAnnotation(tag = "LOGIN", annotation = "login")
+        withStyle(style = SpanStyle(color = Color.Cyan, fontWeight = FontWeight.SemiBold)) {
+            append("Login")
+        }
+        pop()
+    }
+
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -112,18 +130,28 @@ fun SplashPage(){
         Text(
             text = "Enter your email to sign up",
             color = Color.LightGray,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
         Spacer(Modifier.height(64.dp))
-        MainButton(text = "Sign Up", onClick = {})
+        MainButton(text = "Sign Up", onClick = {
+            val intent= Intent(context, SignUpActivity::class.java)
+            context.startActivity(intent)
+        })
 
         Spacer(Modifier.height(34.dp))
-        Text(
-            text = "I already have an account? Login",
-            color = Color.LightGray,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
+        ClickableText(
+            text = annotatedText,
+            style = TextStyle(
+                color = Color.LightGray,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            ),
+            onClick = { offset ->
+                annotatedText.getStringAnnotations(tag = "LOGIN", start = offset, end = offset)
+                    .firstOrNull()?.let {
+                    }
+            }
         )
     }
 }
