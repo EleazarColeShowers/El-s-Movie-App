@@ -39,6 +39,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import com.example.elsmovieapp.authUI.LogInActivity
 import com.example.elsmovieapp.authUI.SignUpActivity
 
 class Splash : ComponentActivity() {
@@ -150,6 +151,8 @@ fun SplashPage(){
             onClick = { offset ->
                 annotatedText.getStringAnnotations(tag = "LOGIN", start = offset, end = offset)
                     .firstOrNull()?.let {
+                        val intent= Intent(context, LogInActivity::class.java)
+                        context.startActivity(intent)
                     }
             }
         )
