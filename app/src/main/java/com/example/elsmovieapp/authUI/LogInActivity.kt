@@ -26,35 +26,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import com.example.elsmovieapp.R
 import com.example.elsmovieapp.components.AppTextField
 import com.example.elsmovieapp.components.MainButton
+import com.example.elsmovieapp.data.AuthViewModel
+import com.example.elsmovieapp.data.AuthViewModelFactory
+import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 
 class LogInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Create repository and ViewModel
+        val repository = AuthRepository()
+        val viewModel: AuthViewModel = ViewModelProvider(
+            this,
+            AuthViewModelFactory(repository)
+        )[AuthViewModel::class.java]
+
         enableEdgeToEdge()
         setContent {
             ElsMovieAppTheme {
                 val dark = colorResource(id = R.color.dark)
-                var showSplash by remember { mutableStateOf(true) }
-
-                LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(2000)
-                    showSplash = false
-                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = dark
                 ) { innerPadding ->
-
                     Login(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .fillMaxSize()
+                            .fillMaxSize(),
+                        viewModel = viewModel
                     )
                 }
             }
@@ -62,14 +67,16 @@ class LogInActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
-fun Login(modifier: Modifier){
+fun Login(modifier: Modifier, viewModel: AuthViewModel) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ){
+    ) {
         Text(
             text = "Hi!",
             fontSize = 28.sp,
@@ -87,23 +94,24 @@ fun Login(modifier: Modifier){
         Spacer(Modifier.height(64.dp))
         AppTextField(
             label = "Email",
-            value = "placeholder",
-            onValueChange = {},
+            value = email,
+            onValueChange = { email = it },
             keyboardType = KeyboardType.Email
         )
         Spacer(Modifier.height(24.dp))
         AppTextField(
             label = "Password",
-            value = "password",
-            onValueChange = {},
+            value = password,
+            onValueChange = { password = it },
             isPassword = true,
             keyboardType = KeyboardType.Password
         )
         Spacer(Modifier.height(50.dp))
-        MainButton(text = "Login", onClick = {})
-
-
-
-
+        MainButton(
+            text = "Login",
+            onClick = {
+                viewModel.login(email, password)
+            }
+        )
     }
 }

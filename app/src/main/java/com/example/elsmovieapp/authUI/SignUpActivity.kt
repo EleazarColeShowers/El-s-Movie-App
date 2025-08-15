@@ -1,13 +1,10 @@
 package com.example.elsmovieapp.authUI
 
-import android.R.attr.password
-import android.content.Intent
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,27 +27,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import com.example.elsmovieapp.R
-import com.example.elsmovieapp.SplashPage
-import com.example.elsmovieapp.SplashScreen
 import com.example.elsmovieapp.components.AppTextField
 import com.example.elsmovieapp.components.MainButton
+import com.example.elsmovieapp.data.AuthViewModel
+import com.example.elsmovieapp.data.AuthViewModelFactory
+import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 
 class SignUpActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val repository = AuthRepository()
+
+        val viewModel: AuthViewModel = ViewModelProvider(
+            this,
+            AuthViewModelFactory(repository)
+        )[AuthViewModel::class.java]
+
 
         enableEdgeToEdge()
         setContent {
             ElsMovieAppTheme {
                 val dark = colorResource(id = R.color.dark)
-                var showSplash by remember { mutableStateOf(true) }
-
-                LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(2000)
-                    showSplash = false
-                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -60,7 +62,8 @@ class SignUpActivity : ComponentActivity() {
                    SignUpPage(
                        modifier = Modifier
                          .padding(innerPadding)
-                         .fillMaxSize()
+                         .fillMaxSize(),
+                       viewModel
                    )
                 }
             }
@@ -69,7 +72,11 @@ class SignUpActivity : ComponentActivity() {
 }
 
 @Composable
-fun SignUpPage(modifier: Modifier){
+fun SignUpPage(modifier: Modifier, viewModel: AuthViewModel){
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,27 +99,29 @@ fun SignUpPage(modifier: Modifier){
         Spacer(Modifier.height(64.dp))
         AppTextField(
             label= "Full Name",
-            value = "placeholder",
+            value = fullName,
             onValueChange = {},
             keyboardType = KeyboardType.Text
         )
         Spacer(Modifier.height(24.dp))
         AppTextField(
             label = "Email",
-            value = "placeholder",
+            value = email,
             onValueChange = {},
             keyboardType = KeyboardType.Email
         )
         Spacer(Modifier.height(24.dp))
         AppTextField(
             label = "Password",
-            value = "password",
+            value = password,
             onValueChange = {},
             isPassword = true,
             keyboardType = KeyboardType.Password
         )
         Spacer(Modifier.height(50.dp))
-        MainButton(text = "Sign Up", onClick = {})
+        MainButton(text = "Sign Up", onClick = {
+            viewModel.signUp(email, password)
+        })
 
 
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "774487154156",
+    "project_id": "el-s-movie-app",
+    "storage_bucket": "el-s-movie-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774487154156:android:45246e48c0ed4751d374c9",
+        "android_client_info": {
+          "package_name": "com.example.elsmovieapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWmjQEL1BC3u0NBIryqDrZloMqVOO9eXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
