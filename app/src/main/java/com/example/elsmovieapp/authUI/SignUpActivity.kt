@@ -1,6 +1,7 @@
 package com.example.elsmovieapp.authUI
 
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,12 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import com.example.elsmovieapp.HomeActivity
 import com.example.elsmovieapp.R
 import com.example.elsmovieapp.components.AppTextField
 import com.example.elsmovieapp.components.MainButton
@@ -42,12 +44,10 @@ class SignUpActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val repository = AuthRepository()
-
         val viewModel: AuthViewModel = ViewModelProvider(
             this,
             AuthViewModelFactory(repository)
         )[AuthViewModel::class.java]
-
 
         enableEdgeToEdge()
         setContent {
@@ -76,6 +76,7 @@ fun SignUpPage(modifier: Modifier, viewModel: AuthViewModel){
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context= LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -100,31 +101,34 @@ fun SignUpPage(modifier: Modifier, viewModel: AuthViewModel){
         AppTextField(
             label= "Full Name",
             value = fullName,
-            onValueChange = {},
+            onValueChange = { fullName = it },
             keyboardType = KeyboardType.Text
         )
         Spacer(Modifier.height(24.dp))
         AppTextField(
             label = "Email",
             value = email,
-            onValueChange = {},
+            onValueChange = { email = it },
             keyboardType = KeyboardType.Email
         )
         Spacer(Modifier.height(24.dp))
         AppTextField(
             label = "Password",
             value = password,
-            onValueChange = {},
+            onValueChange = { password = it },
             isPassword = true,
             keyboardType = KeyboardType.Password
         )
         Spacer(Modifier.height(50.dp))
         MainButton(text = "Sign Up", onClick = {
-            viewModel.signUp(email, password)
+            viewModel.signUp(email, password, fullName)
+            context.startActivity(
+                Intent(
+                    context,
+                    HomeActivity::class.java
+                )
+            )
         })
-
-
-
 
     }
 }

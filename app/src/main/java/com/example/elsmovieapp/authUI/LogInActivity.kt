@@ -1,5 +1,6 @@
 package com.example.elsmovieapp.authUI
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,19 +16,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import com.example.elsmovieapp.HomeActivity
 import com.example.elsmovieapp.R
+import com.example.elsmovieapp.Splash
 import com.example.elsmovieapp.components.AppTextField
 import com.example.elsmovieapp.components.MainButton
 import com.example.elsmovieapp.data.AuthViewModel
@@ -71,6 +76,8 @@ class LogInActivity : ComponentActivity() {
 fun Login(modifier: Modifier, viewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val username by viewModel.username.observeAsState()
 
     Column(
         modifier = modifier,
@@ -78,7 +85,7 @@ fun Login(modifier: Modifier, viewModel: AuthViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Hi!",
+            text = if (username != null) "Hi! $username" else "Hi!",
             fontSize = 28.sp,
             color = Color.White,
             fontWeight = FontWeight.SemiBold
@@ -111,6 +118,12 @@ fun Login(modifier: Modifier, viewModel: AuthViewModel) {
             text = "Login",
             onClick = {
                 viewModel.login(email, password)
+                context.startActivity(
+                    Intent(
+                        context,
+                        HomeActivity::class.java
+                    )
+                )
             }
         )
     }

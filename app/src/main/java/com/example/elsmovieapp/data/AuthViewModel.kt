@@ -17,9 +17,13 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     private val _isLoggedIn = MutableLiveData(false)
     val isLoggedIn: LiveData<Boolean> get() = _isLoggedIn
 
-    fun signUp(email: String, password: String) {
+
+    private val _username = MutableLiveData<String?>()
+    val username: LiveData<String?> get() = _username
+
+    fun signUp(email: String, password: String, fullName: String) {
         _loading.value = true
-        repository.signUp(email, password) { success, errorMsg ->
+        repository.signUp(email, password, fullName) { success, errorMsg ->
             _loading.value = false
             if (success) _isLoggedIn.value = true
             else _error.value = errorMsg
@@ -32,6 +36,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
             _loading.value = false
             if (success) _isLoggedIn.value = true
             else _error.value = errorMsg
+        }
+    }
+
+    fun fetchUserName() {
+        repository.fetchUserName { name ->
+            _username.value = name
         }
     }
 }

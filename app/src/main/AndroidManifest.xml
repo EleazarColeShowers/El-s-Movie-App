@@ -25,6 +25,7 @@
         <activity android:name=".Splash"/>
         <activity android:name=".authUI.SignUpActivity"/>
         <activity android:name=".authUI.LogInActivity"/>
+        <activity android:name=".HomeActivity"/>
 
     </application>
 
