@@ -77,7 +77,6 @@ fun Login(modifier: Modifier, viewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val username by viewModel.username.observeAsState()
 
     Column(
         modifier = modifier,
@@ -85,7 +84,7 @@ fun Login(modifier: Modifier, viewModel: AuthViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = if (username != null) "Hi! $username" else "Hi!",
+            text = "Hi!",
             fontSize = 28.sp,
             color = Color.White,
             fontWeight = FontWeight.SemiBold
