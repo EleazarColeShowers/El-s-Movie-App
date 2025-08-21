@@ -1,4 +1,4 @@
-package com.example.elsmovieapp.model
+package com.example.elsmovieapp.data.model
 
 data class OnboardingPage(
     val image: Int,

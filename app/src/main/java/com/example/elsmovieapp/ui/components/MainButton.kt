@@ -1,4 +1,4 @@
-package com.example.elsmovieapp.components
+package com.example.elsmovieapp.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth

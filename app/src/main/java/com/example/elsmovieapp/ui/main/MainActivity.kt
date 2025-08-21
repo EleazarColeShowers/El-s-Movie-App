@@ -1,4 +1,4 @@
-package com.example.elsmovieapp
+package com.example.elsmovieapp.ui.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -39,7 +39,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.elsmovieapp.model.OnboardingPage
+import com.example.elsmovieapp.R
+import com.example.elsmovieapp.data.model.OnboardingPage
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import kotlinx.coroutines.launch
 import kotlin.jvm.java
@@ -72,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Onboarding(modifier: Modifier){
-    val black= colorResource(id=R.color.black)
+    val black= colorResource(id= R.color.black)
     val cyan= colorResource(id= R.color.cyan)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()

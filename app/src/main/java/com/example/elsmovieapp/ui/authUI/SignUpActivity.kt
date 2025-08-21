@@ -1,4 +1,4 @@
-package com.example.elsmovieapp.authUI
+package com.example.elsmovieapp.ui.authUI
 
 
 import android.content.Intent
@@ -29,10 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
-import com.example.elsmovieapp.HomeActivity
+import com.example.elsmovieapp.ui.main.HomeActivity
 import com.example.elsmovieapp.R
-import com.example.elsmovieapp.components.AppTextField
-import com.example.elsmovieapp.components.MainButton
+import com.example.elsmovieapp.ui.components.AppTextField
+import com.example.elsmovieapp.ui.components.MainButton
 import com.example.elsmovieapp.data.AuthViewModel
 import com.example.elsmovieapp.data.AuthViewModelFactory
 import com.example.elsmovieapp.data.repository.AuthRepository

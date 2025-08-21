@@ -1,4 +1,4 @@
-package com.example.elsmovieapp
+package com.example.elsmovieapp.ui.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -29,7 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.elsmovieapp.components.MainButton
+import com.example.elsmovieapp.ui.components.MainButton
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -39,8 +39,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import com.example.elsmovieapp.authUI.LogInActivity
-import com.example.elsmovieapp.authUI.SignUpActivity
+import com.example.elsmovieapp.R
+import com.example.elsmovieapp.ui.authUI.LogInActivity
+import com.example.elsmovieapp.ui.authUI.SignUpActivity
+import kotlinx.coroutines.delay
 
 class Splash : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +55,7 @@ class Splash : ComponentActivity() {
                 var showSplash by remember { mutableStateOf(true) }
 
                 LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(2000)
+                    delay(2000)
                     showSplash = false
                 }
 

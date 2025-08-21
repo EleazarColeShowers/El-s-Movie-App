@@ -1,4 +1,4 @@
-package com.example.elsmovieapp.authUI
+package com.example.elsmovieapp.ui.authUI
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,11 +28,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
-import com.example.elsmovieapp.HomeActivity
+import com.example.elsmovieapp.ui.main.HomeActivity
 import com.example.elsmovieapp.R
-import com.example.elsmovieapp.Splash
-import com.example.elsmovieapp.components.AppTextField
-import com.example.elsmovieapp.components.MainButton
+import com.example.elsmovieapp.ui.components.AppTextField
+import com.example.elsmovieapp.ui.components.MainButton
 import com.example.elsmovieapp.data.AuthViewModel
 import com.example.elsmovieapp.data.AuthViewModelFactory
 import com.example.elsmovieapp.data.repository.AuthRepository
