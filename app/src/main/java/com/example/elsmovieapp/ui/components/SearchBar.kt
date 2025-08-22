@@ -49,7 +49,7 @@ fun SearchBar(
         ),
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .height(50.dp)
+            .fillMaxWidth()
+            .height(53.dp)
     )
 }
