@@ -56,6 +56,7 @@ import com.example.elsmovieapp.R
 import com.example.elsmovieapp.data.AuthViewModel
 import com.example.elsmovieapp.data.AuthViewModelFactory
 import com.example.elsmovieapp.data.repository.AuthRepository
+import com.example.elsmovieapp.ui.components.MoviePlaceholderCard
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import kotlinx.coroutines.delay
@@ -102,7 +103,6 @@ fun HomePage(
     var selectedCategory by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
     val username by viewModel.username.observeAsState()
-    val black= colorResource(id= R.color.black)
 
     LaunchedEffect(Unit) {
         viewModel.fetchUserName()
@@ -196,6 +196,17 @@ fun HomePage(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(10) { // 10 placeholder items
+                MoviePlaceholderCard()
+            }
+        }
     }
 }
 
@@ -273,3 +284,4 @@ fun HeroCarouselCards(
         }
     }
 }
+
