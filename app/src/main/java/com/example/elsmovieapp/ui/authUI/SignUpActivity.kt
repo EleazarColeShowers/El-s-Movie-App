@@ -33,8 +33,8 @@ import com.example.elsmovieapp.ui.main.HomeActivity
 import com.example.elsmovieapp.R
 import com.example.elsmovieapp.ui.components.AppTextField
 import com.example.elsmovieapp.ui.components.MainButton
-import com.example.elsmovieapp.data.AuthViewModel
-import com.example.elsmovieapp.data.AuthViewModelFactory
+import com.example.elsmovieapp.ui.viewmodel.AuthViewModel
+import com.example.elsmovieapp.ui.viewmodel.AuthViewModelFactory
 import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 

@@ -1,4 +1,4 @@
-package com.example.elsmovieapp.data
+package com.example.elsmovieapp.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
