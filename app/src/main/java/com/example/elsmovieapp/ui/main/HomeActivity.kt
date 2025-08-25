@@ -63,7 +63,7 @@ import com.example.elsmovieapp.ui.viewmodel.AuthViewModel
 import com.example.elsmovieapp.ui.viewmodel.AuthViewModelFactory
 import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.data.repository.MovieRepository
-import com.example.elsmovieapp.ui.components.MoviePlaceholderCard
+import com.example.elsmovieapp.ui.components.MovieCard
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import com.example.elsmovieapp.ui.viewmodel.MovieViewModel
@@ -108,20 +108,39 @@ fun HomePage(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel
 ) {
-    val categories = listOf("All", "Comedy", "Animation", "Series", "Documentary")
+    val categories = listOf(
+        "All", "Action", "Adventure", "Animation", "Comedy",
+        "Crime", "Documentary", "Drama", "Family", "Fantasy",
+        "History", "Horror", "Music", "Mystery", "Romance",
+        "Science Fiction", "TV Movie", "Thriller", "War", "Western", "Series"
+    )
+
+    val genreMap = mapOf(
+        "Action" to 28, "Adventure" to 12, "Animation" to 16, "Comedy" to 35,
+        "Crime" to 80, "Documentary" to 99, "Drama" to 18, "Family" to 10751,
+        "Fantasy" to 14, "History" to 36, "Horror" to 27, "Music" to 10402,
+        "Mystery" to 9648, "Romance" to 10749, "Science Fiction" to 878,
+        "TV Movie" to 10770, "Thriller" to 53, "War" to 10752, "Western" to 37
+    )
+
     var selectedCategory by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
+
     val username by viewModel.username.observeAsState()
     val movieViewModel: MovieViewModel = viewModel(factory = MovieViewModelFactory(MovieRepository()))
     val movies by movieViewModel.movies.collectAsState()
 
+    // Fetch movies and username
     LaunchedEffect(Unit) {
         movieViewModel.fetchMovies()
+        viewModel.fetchUserName()
     }
 
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchUserName()
+    val filteredMovies = if (selectedCategory == "All") {
+        movies
+    } else {
+        val genreId = genreMap[selectedCategory]
+        movies.filter { it.genre_ids.contains(genreId) }
     }
 
     Column(
@@ -178,20 +197,13 @@ fun HomePage(
 
         Text(
             text = "Categories",
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White
-            )
+            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
         )
         Spacer(modifier = Modifier.height(15.dp))
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(categories) { category ->
                 val isSelected = category == selectedCategory
-
                 Text(
                     text = category,
                     modifier = Modifier
@@ -215,23 +227,19 @@ fun HomePage(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(10) { // 10 placeholder items
-                MoviePlaceholderCard()
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(filteredMovies) { movie ->
+                MovieCard(movie = movie, genreMap = genreMap)
             }
         }
     }
 }
-
 @Composable
 fun HeroCarouselCards(
     movies: List<Movie>,
     peekRightDp: Dp = 50.dp,
     pageSpacing: Dp = 16.dp,
-    cardHeight: Dp = 340.dp,     // a bit taller as you wanted
+    cardHeight: Dp = 340.dp,
     cornerRadius: Dp = 24.dp
 ) {
     if (movies.isEmpty()) return

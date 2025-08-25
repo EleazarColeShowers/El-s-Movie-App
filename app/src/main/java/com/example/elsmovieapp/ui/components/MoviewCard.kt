@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -18,13 +19,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.example.elsmovieapp.data.model.Movie
 
 @Composable
-fun MoviePlaceholderCard() {
+fun MovieCard(movie: Movie,  genreMap: Map<String, Int>) {
+
     Column(
         modifier = Modifier
             .width(135.dp)
@@ -38,7 +43,14 @@ fun MoviePlaceholderCard() {
                 .background(Color.DarkGray),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
+            movie.poster_path?.let {
+                AsyncImage(
+                    model = "https://image.tmdb.org/t/p/w500${it}",
+                    contentDescription = movie.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } ?: Icon(
                 imageVector = Icons.Default.Face,
                 contentDescription = null,
                 tint = Color.LightGray,
@@ -49,7 +61,7 @@ fun MoviePlaceholderCard() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Movie Title",
+            text = movie.title,
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
@@ -57,8 +69,12 @@ fun MoviePlaceholderCard() {
             overflow = TextOverflow.Ellipsis
         )
 
+        val genreNames = movie.genre_ids.mapNotNull { id ->
+            genreMap.entries.find { it.value == id }?.key
+        }.joinToString(", ")
+
         Text(
-            text = "Genre",
+            text = genreNames,
             color = Color.Gray,
             fontSize = 12.sp,
             maxLines = 1,
