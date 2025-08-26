@@ -2,6 +2,7 @@ package com.example.elsmovieapp.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle.Companion.dark
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -26,7 +27,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -63,6 +66,7 @@ import com.example.elsmovieapp.ui.viewmodel.AuthViewModel
 import com.example.elsmovieapp.ui.viewmodel.AuthViewModelFactory
 import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.data.repository.MovieRepository
+import com.example.elsmovieapp.ui.components.BottomBar
 import com.example.elsmovieapp.ui.components.MovieCard
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
@@ -108,6 +112,7 @@ fun HomePage(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel
 ) {
+    val dark = colorResource(id = R.color.dark)
     val categories = listOf(
         "All", "Action", "Adventure", "Animation", "Comedy",
         "Crime", "Documentary", "Drama", "Family", "Fantasy",
@@ -143,11 +148,16 @@ fun HomePage(
         movies.filter { it.genre_ids.contains(genreId) }
     }
 
-    Column(
+    Scaffold(
+        bottomBar = { BottomBar() },
+        containerColor = dark
+    ) { innerPadding ->
+        Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
-    ) {
+            .verticalScroll(rememberScrollState())
+        ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -233,7 +243,9 @@ fun HomePage(
             }
         }
     }
+    }
 }
+
 @Composable
 fun HeroCarouselCards(
     movies: List<Movie>,
