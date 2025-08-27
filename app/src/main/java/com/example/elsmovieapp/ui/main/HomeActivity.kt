@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -46,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -233,16 +235,39 @@ fun HomePage(
                     fontWeight = FontWeight.Medium
                 )
             }
+
         }
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(filteredMovies) { movie ->
-                MovieCard(movie = movie, genreMap = genreMap)
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(filteredMovies) { movie ->
+                    MovieCard(movie = movie, genreMap = genreMap)
+                }
+
+                item {
+                    Box(
+                        modifier = Modifier
+                            .width(135.dp)
+                            .height(231.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.DarkGray)
+                            .clickable { movieViewModel.fetchMovies() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Load More",
+                            color = Color.Cyan,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
+
         }
-    }
     }
 }
 
@@ -321,14 +346,6 @@ fun HeroCarouselCards(
                             .background(Color.Black.copy(alpha = 0.28f))
                     )
 
-                    Text(
-                        text = movie.title,
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(16.dp)
-                    )
                 }
             }
         }

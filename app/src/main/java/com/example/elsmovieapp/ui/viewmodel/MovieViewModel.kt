@@ -18,18 +18,24 @@ class MovieViewModel(
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies
 
+    private var currentPage = 1
+    private val allMovies = mutableListOf<Movie>()
+
     fun fetchMovies() {
         viewModelScope.launch {
             try {
-                val response = repository.getPopularMovies()
-                _movies.value = response.results
-                Log.d("MovieViewModel", "Fetched movies: ${response.results.size}")
+                val response = repository.getPopularMovies(currentPage)
+
+                // append instead of replace
+                _movies.value = _movies.value + response.results
+
+                currentPage++
+                Log.d("MovieViewModel", "Fetched page $currentPage, total: ${_movies.value.size}")
             } catch (e: Exception) {
                 Log.e("MovieViewModel", "Error fetching movies", e)
             }
         }
     }
-
 }
 
 class MovieViewModelFactory(
@@ -43,4 +49,3 @@ class MovieViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
