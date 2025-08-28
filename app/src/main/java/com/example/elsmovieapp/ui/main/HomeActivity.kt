@@ -136,10 +136,15 @@ fun HomePage(
     val username by viewModel.username.observeAsState()
     val movieViewModel: MovieViewModel = viewModel(factory = MovieViewModelFactory(MovieRepository()))
     val movies by movieViewModel.movies.collectAsState()
+    val nowPlaying by movieViewModel.nowPlaying.collectAsState()
+    val topRated by movieViewModel.topRated.collectAsState()
+    val upcoming by movieViewModel.upcoming.collectAsState()
 
-    // Fetch movies and username
     LaunchedEffect(Unit) {
         movieViewModel.fetchMovies()
+        movieViewModel.fetchNowPlaying()
+        movieViewModel.fetchTopRated()
+        movieViewModel.fetchUpcoming()
         viewModel.fetchUserName()
     }
 
@@ -266,8 +271,74 @@ fun HomePage(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(20.dp))
 
+            MovieSection(
+                title = "Now Playing",
+                movies = nowPlaying,
+                onLoadMore = { movieViewModel.fetchNowPlaying() },
+                genreMap = genreMap
+            )
+
+            MovieSection(
+                title = "Top Rated",
+                movies = topRated,
+                onLoadMore = { movieViewModel.fetchTopRated() },
+                genreMap = genreMap
+            )
+
+            MovieSection(
+                title = "Upcoming",
+                movies = upcoming,
+                onLoadMore = { movieViewModel.fetchUpcoming() },
+                genreMap = genreMap
+            )
         }
+    }
+}
+
+@Composable
+fun MovieSection(
+    title: String,
+    movies: List<Movie>,
+    onLoadMore: () -> Unit,
+    genreMap: Map<String, Int>
+) {
+    Spacer(modifier = Modifier.height(20.dp))
+    Text(
+        text = title,
+        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+    )
+    Spacer(modifier = Modifier.height(15.dp))
+
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        items(movies) { movie ->
+            MovieCard(movie = movie, genreMap = genreMap)
+        }
+
+        item {
+            LoadMoreCard { onLoadMore() }
+        }
+    }
+}
+
+@Composable
+fun LoadMoreCard(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .width(135.dp)
+            .height(231.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.DarkGray)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Load More",
+            color = Color.Cyan,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

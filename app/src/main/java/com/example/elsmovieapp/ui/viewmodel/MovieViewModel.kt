@@ -18,25 +18,72 @@ class MovieViewModel(
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies
 
+    private val _nowPlaying = MutableStateFlow<List<Movie>>(emptyList())
+    val nowPlaying: StateFlow<List<Movie>> = _nowPlaying
+
+    private val _topRated = MutableStateFlow<List<Movie>>(emptyList())
+    val topRated: StateFlow<List<Movie>> = _topRated
+
+    private val _upcoming = MutableStateFlow<List<Movie>>(emptyList())
+    val upcoming: StateFlow<List<Movie>> = _upcoming
+
     private var currentPage = 1
-    private val allMovies = mutableListOf<Movie>()
+    private var nowPlayingPage = 1
+    private var topRatedPage = 1
+    private var upcomingPage = 1
 
     fun fetchMovies() {
         viewModelScope.launch {
             try {
                 val response = repository.getPopularMovies(currentPage)
-
-                // append instead of replace
                 _movies.value = _movies.value + response.results
-
                 currentPage++
-                Log.d("MovieViewModel", "Fetched page $currentPage, total: ${_movies.value.size}")
+                Log.d("MovieViewModel", "Fetched popular page $currentPage")
             } catch (e: Exception) {
-                Log.e("MovieViewModel", "Error fetching movies", e)
+                Log.e("MovieViewModel", "Error fetching popular movies", e)
+            }
+        }
+    }
+
+    fun fetchNowPlaying() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getNowPlayingMovies(nowPlayingPage)
+                _nowPlaying.value = _nowPlaying.value + response.results
+                nowPlayingPage++
+                Log.d("MovieViewModel", "Fetched now playing page $nowPlayingPage")
+            } catch (e: Exception) {
+                Log.e("MovieViewModel", "Error fetching now playing movies", e)
+            }
+        }
+    }
+    fun fetchTopRated() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getTopRated(topRatedPage)
+                _topRated.value = _topRated.value + response.results
+                topRatedPage++
+                Log.d("MovieViewModel", "Fetched top rated page $topRatedPage")
+            } catch (e: Exception) {
+                Log.e("MovieViewModel", "Error fetching top rated movies", e)
+            }
+        }
+    }
+
+    fun fetchUpcoming() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getUpcoming(upcomingPage)
+                _upcoming.value = _upcoming.value + response.results
+                upcomingPage++
+                Log.d("MovieViewModel", "Fetched upcoming page $upcomingPage")
+            } catch (e: Exception) {
+                Log.e("MovieViewModel", "Error fetching upcoming movies", e)
             }
         }
     }
 }
+
 
 class MovieViewModelFactory(
     private val repository: MovieRepository
