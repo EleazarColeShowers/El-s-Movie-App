@@ -26,6 +26,7 @@
         <activity android:name=".ui.authUI.SignUpActivity"/>
         <activity android:name=".ui.authUI.LogInActivity"/>
         <activity android:name=".ui.main.HomeActivity"/>
+        <activity android:name=".ui.search.Search"/>
 
     </application>
 

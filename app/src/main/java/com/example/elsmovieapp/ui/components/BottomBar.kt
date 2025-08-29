@@ -1,5 +1,6 @@
 package com.example.elsmovieapp.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,22 +15,22 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.elsmovieapp.ui.main.HomeActivity
+import com.example.elsmovieapp.ui.search.Search
+import kotlin.jvm.java
 
 @Composable
 fun BottomBar() {
     var selectedItem by remember { mutableStateOf("Home") }
-
+    val context = LocalContext.current
 
     val items = listOf(
         "Home" to Icons.Default.Home,
@@ -45,7 +46,14 @@ fun BottomBar() {
             val isSelected = selectedItem == label
             NavigationBarItem(
                 selected = isSelected,
-                onClick = { selectedItem = label },
+                onClick = {
+                    selectedItem = label
+                    when (label) {
+                        "Home" -> context.startActivity(Intent(context, HomeActivity::class.java))
+                        "Search" -> context.startActivity(Intent(context, Search::class.java))
+//                        "Profile" -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                    }
+                },
                 icon = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
