@@ -32,6 +32,7 @@ class MovieViewModel(
     private var topRatedPage = 1
     private var upcomingPage = 1
 
+
     fun fetchMovies() {
         viewModelScope.launch {
             try {

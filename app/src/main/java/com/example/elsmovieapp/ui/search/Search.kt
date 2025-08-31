@@ -4,29 +4,67 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.elsmovieapp.R
+import com.example.elsmovieapp.data.model.Movie
 import com.example.elsmovieapp.data.repository.AuthRepository
+import com.example.elsmovieapp.data.repository.MovieRepository
+import com.example.elsmovieapp.ui.components.SearchBar
+import com.example.elsmovieapp.ui.components.categories
+import com.example.elsmovieapp.ui.components.genreMap
 import com.example.elsmovieapp.ui.main.HomePage
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import com.example.elsmovieapp.ui.viewmodel.AuthViewModel
 import com.example.elsmovieapp.ui.viewmodel.AuthViewModelFactory
+import com.example.elsmovieapp.ui.viewmodel.MovieViewModel
+import com.example.elsmovieapp.ui.viewmodel.MovieViewModelFactory
 
-class Search  : ComponentActivity() {
+class Search : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val repository = AuthRepository()
-        val viewModel: AuthViewModel = ViewModelProvider(
+        val repository = MovieRepository()
+        val viewModel: MovieViewModel = ViewModelProvider(
             this,
-            AuthViewModelFactory(repository)
-        )[AuthViewModel::class.java]
+            MovieViewModelFactory(repository)
+        )[MovieViewModel::class.java]
 
         enableEdgeToEdge()
         setContent {
@@ -38,12 +76,162 @@ class Search  : ComponentActivity() {
                     containerColor = dark
                 ) { innerPadding ->
 
-                    HomePage(
+                    SearchPage(
                         modifier = Modifier.padding(innerPadding),
-                        viewModel
+                        viewModel = viewModel
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+fun SearchPage(
+    modifier: Modifier = Modifier,
+    viewModel: MovieViewModel
+) {
+    var selectedCategory by remember { mutableStateOf("All") }
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Collect the list from VM
+    val movies by viewModel.nowPlaying.collectAsStateWithLifecycle(emptyList())
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchNowPlaying() // or fetchMovies()
+    }
+
+    // Refetch when category changes
+    LaunchedEffect(selectedCategory) {
+        if (selectedCategory == "All") {
+            viewModel.fetchNowPlaying()
+        } else {
+            genreMap[selectedCategory]?.let {
+                viewModel.fetchMovies()
+            }
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        SearchBar(
+            value = searchQuery,
+            onValueChange = { newValue -> searchQuery = newValue }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(categories) { category ->
+                val isSelected = category == selectedCategory
+                FilterChip(
+                    selected = isSelected,
+                    onClick = { selectedCategory = category },
+                    label = {
+                        Text(
+                            text = category,
+                            color = if (isSelected) Color.Cyan else Color.Gray
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
+                        selectedContainerColor = Color.Cyan.copy(alpha = 0.45f)
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val todayMovie = movies.firstOrNull()
+        if (todayMovie != null) {
+            TodayMovieCard(movie = todayMovie)
+        } else {
+            Text(
+                text = "Loading latest movies…",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    }
+}
+@Composable
+fun TodayMovieCard(movie: Movie) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(0.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Text(
+                text = "Today",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(150.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.DarkGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    movie.poster_path?.let {
+                        AsyncImage(
+                            model = "https://image.tmdb.org/t/p/w500${movie.poster_path}",
+                            contentDescription = movie.title,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = movie.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Year: ${movie.release_date?.take(4)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.LightGray
+                    )
+                    Text(
+                        text = "Genre: ${getGenreNames(movie.genre_ids)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.LightGray
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun getGenreNames(genreIds: List<Int>): String {
+    val reversedMap = genreMap.entries.associate { (name, id) -> id to name }
+    return genreIds.mapNotNull { reversedMap[it] }.joinToString(", ")
 }

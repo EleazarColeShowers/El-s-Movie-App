@@ -71,6 +71,8 @@ import com.example.elsmovieapp.data.repository.MovieRepository
 import com.example.elsmovieapp.ui.components.BottomBar
 import com.example.elsmovieapp.ui.components.MovieCard
 import com.example.elsmovieapp.ui.components.SearchBar
+import com.example.elsmovieapp.ui.components.categories
+import com.example.elsmovieapp.ui.components.genreMap
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
 import com.example.elsmovieapp.ui.viewmodel.MovieViewModel
 import com.example.elsmovieapp.ui.viewmodel.MovieViewModelFactory
@@ -115,26 +117,14 @@ fun HomePage(
     viewModel: AuthViewModel
 ) {
     val dark = colorResource(id = R.color.dark)
-    val categories = listOf(
-        "All", "Action", "Adventure", "Animation", "Comedy",
-        "Crime", "Documentary", "Drama", "Family", "Fantasy",
-        "History", "Horror", "Music", "Mystery", "Romance",
-        "Science Fiction", "TV Movie", "Thriller", "War", "Western", "Series"
-    )
-
-    val genreMap = mapOf(
-        "Action" to 28, "Adventure" to 12, "Animation" to 16, "Comedy" to 35,
-        "Crime" to 80, "Documentary" to 99, "Drama" to 18, "Family" to 10751,
-        "Fantasy" to 14, "History" to 36, "Horror" to 27, "Music" to 10402,
-        "Mystery" to 9648, "Romance" to 10749, "Science Fiction" to 878,
-        "TV Movie" to 10770, "Thriller" to 53, "War" to 10752, "Western" to 37
-    )
 
     var selectedCategory by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
 
     val username by viewModel.username.observeAsState()
-    val movieViewModel: MovieViewModel = viewModel(factory = MovieViewModelFactory(MovieRepository()))
+    val movieViewModel: MovieViewModel =
+        viewModel(factory = MovieViewModelFactory(MovieRepository()))
+
     val movies by movieViewModel.movies.collectAsState()
     val nowPlaying by movieViewModel.nowPlaying.collectAsState()
     val topRated by movieViewModel.topRated.collectAsState()
@@ -151,7 +141,7 @@ fun HomePage(
     val filteredMovies = if (selectedCategory == "All") {
         movies
     } else {
-        val genreId = genreMap[selectedCategory]
+        val genreId = genreMap[selectedCategory]   // ✅ using imported genreMap
         movies.filter { it.genre_ids.contains(genreId) }
     }
 
@@ -160,96 +150,95 @@ fun HomePage(
         containerColor = dark
     ) { innerPadding ->
         Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "Hello, ${username ?: ""}",
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
-                    )
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Let's stream your favorite movies",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Gray
-                    )
-                )
-            }
-
-            Image(
-                painter = painterResource(R.drawable.wishlist),
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        SearchBar(
-            value = searchQuery,
-            onValueChange = { newValue ->
-                searchQuery = newValue
-            }
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-
-        HeroCarouselCards(movies = movies)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Categories",
-            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
-        )
-        Spacer(modifier = Modifier.height(15.dp))
-
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(categories) { category ->
-                val isSelected = category == selectedCategory
-                Text(
-                    text = category,
-                    modifier = Modifier
-                        .clickable { selectedCategory = category }
-                        .background(
-                            color = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = if (isSelected) Color.Cyan else Color.DarkGray,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = if (isSelected) Color.Cyan else Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-        }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Column {
+                    Text(
+                        text = "Hello, ${username ?: ""}",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Let's stream your favorite movies",
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Gray
+                        )
+                    )
+                }
+
+                Image(
+                    painter = painterResource(R.drawable.wishlist),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            SearchBar(
+                value = searchQuery,
+                onValueChange = { newValue -> searchQuery = newValue }
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            HeroCarouselCards(movies = movies)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Categories",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(categories) { category ->   // ✅ using imported categories
+                    val isSelected = category == selectedCategory
+                    Text(
+                        text = category,
+                        modifier = Modifier
+                            .clickable { selectedCategory = category }
+                            .background(
+                                color = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = if (isSelected) Color.Cyan else Color.DarkGray,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = if (isSelected) Color.Cyan else Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(filteredMovies) { movie ->
-                    MovieCard(movie = movie, genreMap = genreMap)
+                    MovieCard(movie = movie, genreMap = genreMap) // ✅ still using imported genreMap
                 }
 
                 item {
@@ -271,6 +260,7 @@ fun HomePage(
                     }
                 }
             }
+
             Spacer(modifier = Modifier.height(20.dp))
 
             MovieSection(
