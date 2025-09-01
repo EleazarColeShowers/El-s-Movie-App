@@ -43,15 +43,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.elsmovieapp.R
 import com.example.elsmovieapp.data.model.Movie
-import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.data.repository.MovieRepository
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.components.categories
 import com.example.elsmovieapp.ui.components.genreMap
-import com.example.elsmovieapp.ui.main.HomePage
 import com.example.elsmovieapp.ui.theme.ElsMovieAppTheme
-import com.example.elsmovieapp.ui.viewmodel.AuthViewModel
-import com.example.elsmovieapp.ui.viewmodel.AuthViewModelFactory
 import com.example.elsmovieapp.ui.viewmodel.MovieViewModel
 import com.example.elsmovieapp.ui.viewmodel.MovieViewModelFactory
 

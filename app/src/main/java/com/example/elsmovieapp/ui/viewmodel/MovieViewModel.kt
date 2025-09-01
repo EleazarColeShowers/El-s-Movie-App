@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.example.elsmovieapp.data.model.Movie
 import com.example.elsmovieapp.data.repository.MovieRepository
 import kotlinx.coroutines.flow.MutableStateFlow
