@@ -28,10 +28,8 @@ import com.example.elsmovieapp.ui.search.Search
 import kotlin.jvm.java
 
 @Composable
-fun BottomBar() {
-    var selectedItem by remember { mutableStateOf("Home") }
+fun BottomBar(currentScreen: String) {
     val context = LocalContext.current
-
     val items = listOf(
         "Home" to Icons.Default.Home,
         "Search" to Icons.Default.Search,
@@ -43,15 +41,16 @@ fun BottomBar() {
         modifier = Modifier.height(65.dp)
     ) {
         items.forEach { (label, icon) ->
-            val isSelected = selectedItem == label
+            val isSelected = currentScreen == label
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
-                    selectedItem = label
-                    when (label) {
-                        "Home" -> context.startActivity(Intent(context, HomeActivity::class.java))
-                        "Search" -> context.startActivity(Intent(context, Search::class.java))
-//                        "Profile" -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                    if (!isSelected) { // avoid relaunching same screen
+                        when (label) {
+                            "Home" -> context.startActivity(Intent(context, HomeActivity::class.java))
+                            "Search" -> context.startActivity(Intent(context, Search::class.java))
+                            // "Profile" -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                        }
                     }
                 },
                 icon = {
@@ -76,7 +75,7 @@ fun BottomBar() {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.Transparent // no ripple bg
+                    indicatorColor = Color.Transparent
                 )
             )
         }

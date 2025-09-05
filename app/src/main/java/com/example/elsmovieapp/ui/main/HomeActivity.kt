@@ -143,7 +143,7 @@ fun HomePage(
     }
 
     Scaffold(
-        bottomBar = { BottomBar() },
+        bottomBar = { BottomBar(currentScreen = "Home") },
         containerColor = dark
     ) { innerPadding ->
         Column(

@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ import coil.compose.AsyncImage
 import com.example.elsmovieapp.R
 import com.example.elsmovieapp.data.model.Movie
 import com.example.elsmovieapp.data.repository.MovieRepository
+import com.example.elsmovieapp.ui.components.BottomBar
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.components.categories
 import com.example.elsmovieapp.ui.components.genreMap
@@ -82,6 +84,7 @@ class Search : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchPage(
     modifier: Modifier = Modifier,
@@ -90,71 +93,84 @@ fun SearchPage(
     var selectedCategory by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
 
-    // Collect the list from VM
     val movies by viewModel.nowPlaying.collectAsStateWithLifecycle(emptyList())
 
     LaunchedEffect(Unit) {
-        viewModel.fetchNowPlaying() // or fetchMovies()
+        viewModel.fetchNowPlaying()
     }
 
-    // Refetch when category changes
-    LaunchedEffect(selectedCategory) {
-        if (selectedCategory == "All") {
-            viewModel.fetchNowPlaying()
-        } else {
-            genreMap[selectedCategory]?.let {
-                viewModel.fetchMovies()
-            }
-        }
-    }
+    Scaffold(
+        bottomBar = { BottomBar(currentScreen = "Search") },
+        containerColor = colorResource(id = R.color.dark)
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal=16.dp, )
+        ) {
+            SearchBar(
+                value = searchQuery,
+                onValueChange = { newValue -> searchQuery = newValue }
+            )
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        SearchBar(
-            value = searchQuery,
-            onValueChange = { newValue -> searchQuery = newValue }
-        )
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(categories) { category ->
-                val isSelected = category == selectedCategory
-                FilterChip(
-                    selected = isSelected,
-                    onClick = { selectedCategory = category },
-                    label = {
-                        Text(
-                            text = category,
-                            color = if (isSelected) Color.Cyan else Color.Gray
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(categories) { category ->
+                    val isSelected = category == selectedCategory
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { selectedCategory = category },
+                        label = {
+                            Text(
+                                text = category,
+                                color = if (isSelected) Color.Cyan else Color.Gray
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
+                            selectedContainerColor = Color.Cyan.copy(alpha = 0.45f)
                         )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        containerColor = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
-                        selectedContainerColor = Color.Cyan.copy(alpha = 0.45f)
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val todayMovie = movies.firstOrNull()
+            if (todayMovie != null) {
+                TodayMovieCard(movie = todayMovie)
+            } else {
+                Text(
+                    text = "Loading latest movies…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(8.dp)
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        val todayMovie = movies.firstOrNull()
-        if (todayMovie != null) {
-            TodayMovieCard(movie = todayMovie)
-        } else {
-            Text(
-                text = "Loading latest movies…",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                modifier = Modifier.padding(8.dp)
-            )
+            if (movies.isNotEmpty()) {
+                Text(
+                    text = "Now Playing",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(movies) { movie ->
+                        NowPlayingCard(movie = movie)
+                    }
+                }
+            }
         }
     }
 }
+
+
 @Composable
 fun TodayMovieCard(movie: Movie) {
     Card(
@@ -224,6 +240,25 @@ fun TodayMovieCard(movie: Movie) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun NowPlayingCard(movie: Movie) {
+    Card(
+        modifier = Modifier
+            .width(135.dp)
+            .height(200.dp)
+            .clip(RoundedCornerShape(8.dp)),
+        elevation = CardDefaults.cardElevation(0.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+    ) {
+        AsyncImage(
+            model = "https://image.tmdb.org/t/p/w500${movie.poster_path}",
+            contentDescription = movie.title,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
     }
 }
 
