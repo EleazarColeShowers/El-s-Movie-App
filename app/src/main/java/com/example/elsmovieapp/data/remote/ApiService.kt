@@ -24,5 +24,11 @@ interface ApiService {
     suspend fun getUpcoming(
         @Query("page") page: Int
     ): MovieResponse
+
+    @GET("search/movie")
+    suspend fun searchMovies(
+        @Query("query") query: String,
+        @Query("page") page: Int = 1
+    ): MovieResponse
 }
 

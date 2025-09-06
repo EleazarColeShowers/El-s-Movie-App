@@ -94,6 +94,7 @@ fun SearchPage(
     var searchQuery by remember { mutableStateOf("") }
 
     val movies by viewModel.nowPlaying.collectAsStateWithLifecycle(emptyList())
+    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchNowPlaying()
@@ -107,11 +108,17 @@ fun SearchPage(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal=16.dp, )
+                .padding(horizontal = 16.dp)
         ) {
+            // 🔍 SearchBar hooked to API
             SearchBar(
                 value = searchQuery,
-                onValueChange = { newValue -> searchQuery = newValue }
+                onValueChange = { newValue ->
+                    searchQuery = newValue
+                    if (newValue.isNotBlank()) {
+                        viewModel.searchMovies(newValue) // call API
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -138,31 +145,47 @@ fun SearchPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val todayMovie = movies.firstOrNull()
-            if (todayMovie != null) {
-                TodayMovieCard(movie = todayMovie)
+            // If searching, show results. Otherwise, show Now Playing.
+            if (searchQuery.isNotBlank()) {
+                if (searchResults.isNotEmpty()) {
+                    Text(
+                        text = "Search Results",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(searchResults) { movie ->
+                            NowPlayingCard(movie = movie)
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "No results found",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
             } else {
-                Text(
-                    text = "Loading latest movies…",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
+                val todayMovie = movies.firstOrNull()
+                if (todayMovie != null) {
+                    TodayMovieCard(movie = todayMovie)
+                }
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            if (movies.isNotEmpty()) {
-                Text(
-                    text = "Now Playing",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(movies) { movie ->
-                        NowPlayingCard(movie = movie)
+                if (movies.isNotEmpty()) {
+                    Text(
+                        text = "Now Playing",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(movies) { movie ->
+                            NowPlayingCard(movie = movie)
+                        }
                     }
                 }
             }

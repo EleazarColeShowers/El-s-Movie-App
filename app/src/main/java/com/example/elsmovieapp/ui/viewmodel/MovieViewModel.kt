@@ -26,6 +26,9 @@ class MovieViewModel(
     private val _upcoming = MutableStateFlow<List<Movie>>(emptyList())
     val upcoming: StateFlow<List<Movie>> = _upcoming
 
+    private val _searchResults = MutableStateFlow<List<Movie>>(emptyList())
+    val searchResults: StateFlow<List<Movie>> = _searchResults
+
     private var currentPage = 1
     private var nowPlayingPage = 1
     private var topRatedPage = 1
@@ -79,6 +82,16 @@ class MovieViewModel(
                 Log.d("MovieViewModel", "Fetched upcoming page $upcomingPage")
             } catch (e: Exception) {
                 Log.e("MovieViewModel", "Error fetching upcoming movies", e)
+            }
+        }
+    }
+    fun searchMovies(query: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.searchMovies(query)
+                _searchResults.value = response.results
+            } catch (e: Exception) {
+                _searchResults.value = emptyList()
             }
         }
     }
