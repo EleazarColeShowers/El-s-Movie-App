@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,11 +42,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.elsmovieapp.R
 import com.example.elsmovieapp.data.model.Movie
 import com.example.elsmovieapp.data.repository.MovieRepository
 import com.example.elsmovieapp.ui.components.BottomBar
+import com.example.elsmovieapp.ui.components.MovieDetailPage
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.components.categories
 import com.example.elsmovieapp.ui.components.genreMap
@@ -96,6 +99,11 @@ fun SearchPage(
     val movies by viewModel.nowPlaying.collectAsStateWithLifecycle(emptyList())
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
 
+    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
+    val movieViewModel: MovieViewModel =
+        viewModel(factory = MovieViewModelFactory(MovieRepository()))
+
+
     LaunchedEffect(Unit) {
         viewModel.fetchNowPlaying()
     }
@@ -104,91 +112,104 @@ fun SearchPage(
         bottomBar = { BottomBar(currentScreen = "Search") },
         containerColor = colorResource(id = R.color.dark)
     ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
-        ) {
-            // 🔍 SearchBar hooked to API
-            SearchBar(
-                value = searchQuery,
-                onValueChange = { newValue ->
-                    searchQuery = newValue
-                    if (newValue.isNotBlank()) {
-                        viewModel.searchMovies(newValue) // call API
+        if (selectedMovie == null) {
+
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp)
+            ) {
+                // 🔍 SearchBar hooked to API
+                SearchBar(
+                    value = searchQuery,
+                    onValueChange = { newValue ->
+                        searchQuery = newValue
+                        if (newValue.isNotBlank()) {
+                            viewModel.searchMovies(newValue) // call API
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(categories) { category ->
+                        val isSelected = category == selectedCategory
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedCategory = category },
+                            label = {
+                                Text(
+                                    text = category,
+                                    color = if (isSelected) Color.Cyan else Color.Gray
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
+                                selectedContainerColor = Color.Cyan.copy(alpha = 0.45f)
+                            )
+                        )
                     }
                 }
-            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(categories) { category ->
-                    val isSelected = category == selectedCategory
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { selectedCategory = category },
-                        label = {
-                            Text(
-                                text = category,
-                                color = if (isSelected) Color.Cyan else Color.Gray
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = if (isSelected) Color.Cyan.copy(alpha = 0.45f) else Color.Transparent,
-                            selectedContainerColor = Color.Cyan.copy(alpha = 0.45f)
+                // If searching, show results. Otherwise, show Now Playing.
+                if (searchQuery.isNotBlank()) {
+                    if (searchResults.isNotEmpty()) {
+                        Text(
+                            text = "Search Results",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White
                         )
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // If searching, show results. Otherwise, show Now Playing.
-            if (searchQuery.isNotBlank()) {
-                if (searchResults.isNotEmpty()) {
-                    Text(
-                        text = "Search Results",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(searchResults) { movie ->
-                            NowPlayingCard(movie = movie)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(searchResults) { movie ->
+                                NowPlayingCard(movie = movie)
+                            }
                         }
+                    } else {
+                        Text(
+                            text = "No results found",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(8.dp)
+                        )
                     }
                 } else {
-                    Text(
-                        text = "No results found",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
-            } else {
-                val todayMovie = movies.firstOrNull()
-                if (todayMovie != null) {
-                    TodayMovieCard(movie = todayMovie)
-                }
+                    val todayMovie = movies.firstOrNull()
+                    if (todayMovie != null) {
+                        TodayMovieCard(movie = todayMovie)
+                    }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                if (movies.isNotEmpty()) {
-                    Text(
-                        text = "Now Playing",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(movies) { movie ->
-                            NowPlayingCard(movie = movie)
+                    if (movies.isNotEmpty()) {
+                        Text(
+                            text = "Now Playing",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(movies) { movie ->
+                                NowPlayingCard(movie = movie)
+                            }
                         }
                     }
                 }
             }
+        } else {
+            LaunchedEffect(selectedMovie!!.id) {
+                movieViewModel.fetchCastDetails(selectedMovie!!.id)
+            }
+            MovieDetailPage(
+                movie = selectedMovie!!,
+                onBack = { selectedMovie = null },
+                cast = movieViewModel.movieCast.collectAsState().value
+
+            )
         }
     }
 }

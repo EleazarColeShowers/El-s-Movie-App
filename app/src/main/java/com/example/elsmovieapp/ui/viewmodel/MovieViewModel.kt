@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.elsmovieapp.data.model.CastMember
 import com.example.elsmovieapp.data.model.Movie
 import com.example.elsmovieapp.data.repository.MovieRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,10 @@ class MovieViewModel(
 
     private val _searchResults = MutableStateFlow<List<Movie>>(emptyList())
     val searchResults: StateFlow<List<Movie>> = _searchResults
+
+    private val _movieCast = MutableStateFlow<List<CastMember>>(emptyList())
+    val movieCast: StateFlow<List<CastMember>> = _movieCast
+
 
     private var currentPage = 1
     private var nowPlayingPage = 1
@@ -95,6 +100,14 @@ class MovieViewModel(
             }
         }
     }
+
+    fun fetchCastDetails(movieId: Int) {
+        viewModelScope.launch {
+            val cast = repository.getMovieCredits(movieId)
+            _movieCast.value = cast
+        }
+    }
+
 }
 
 

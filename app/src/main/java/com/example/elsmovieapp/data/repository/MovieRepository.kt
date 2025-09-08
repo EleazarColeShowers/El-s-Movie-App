@@ -1,5 +1,6 @@
 package com.example.elsmovieapp.data.repository
 
+import com.example.elsmovieapp.data.model.CastMember
 import com.example.elsmovieapp.data.model.MovieResponse
 import com.example.elsmovieapp.data.remote.ApiClient
 
@@ -16,5 +17,9 @@ class MovieRepository {
 
     suspend fun searchMovies(query: String): MovieResponse {
         return api.searchMovies(query)
+    }
+
+    suspend fun getMovieCredits(movieId: Int): List<CastMember> {
+        return api.getMovieCredits(movieId).cast
     }
 }

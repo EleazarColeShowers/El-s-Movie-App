@@ -67,6 +67,7 @@ import com.example.elsmovieapp.data.repository.AuthRepository
 import com.example.elsmovieapp.data.repository.MovieRepository
 import com.example.elsmovieapp.ui.components.BottomBar
 import com.example.elsmovieapp.ui.components.MovieCard
+import com.example.elsmovieapp.ui.components.MovieDetailPage
 import com.example.elsmovieapp.ui.components.SearchBar
 import com.example.elsmovieapp.ui.components.categories
 import com.example.elsmovieapp.ui.components.genreMap
@@ -127,6 +128,9 @@ fun HomePage(
     val topRated by movieViewModel.topRated.collectAsState()
     val upcoming by movieViewModel.upcoming.collectAsState()
 
+    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
+
+
     LaunchedEffect(Unit) {
         movieViewModel.fetchMovies()
         movieViewModel.fetchNowPlaying()
@@ -146,7 +150,9 @@ fun HomePage(
         bottomBar = { BottomBar(currentScreen = "Home") },
         containerColor = dark
     ) { innerPadding ->
-        Column(
+        if (selectedMovie == null) {
+
+            Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp)
@@ -193,7 +199,7 @@ fun HomePage(
             )
             Spacer(modifier = Modifier.height(6.dp))
 
-            HeroCarouselCards(movies = movies)
+            HeroCarouselCards(movies = movies, onMovieClick = { selectedMovie = it })
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -235,7 +241,7 @@ fun HomePage(
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(filteredMovies) { movie ->
-                    MovieCard(movie = movie, genreMap = genreMap) // ✅ still using imported genreMap
+                    MovieCard(movie = movie, genreMap = genreMap, onMovieClick = { selectedMovie = it })
                 }
 
                 item {
@@ -264,21 +270,36 @@ fun HomePage(
                 title = "Now Playing",
                 movies = nowPlaying,
                 onLoadMore = { movieViewModel.fetchNowPlaying() },
-                genreMap = genreMap
+                genreMap = genreMap,
+                onMovieClick = { selectedMovie = it }
             )
 
             MovieSection(
                 title = "Top Rated",
                 movies = topRated,
                 onLoadMore = { movieViewModel.fetchTopRated() },
-                genreMap = genreMap
+                genreMap = genreMap,
+                onMovieClick = { selectedMovie = it }
             )
 
             MovieSection(
                 title = "Upcoming",
                 movies = upcoming,
                 onLoadMore = { movieViewModel.fetchUpcoming() },
-                genreMap = genreMap
+                genreMap = genreMap,
+                onMovieClick = { selectedMovie = it }
+            )
+        }
+        }
+        else {
+            LaunchedEffect(selectedMovie!!.id) {
+                movieViewModel.fetchCastDetails(selectedMovie!!.id)
+            }
+            MovieDetailPage(
+                movie = selectedMovie!!,
+                onBack = { selectedMovie = null },
+                cast = movieViewModel.movieCast.collectAsState().value
+
             )
         }
     }
@@ -289,7 +310,8 @@ fun MovieSection(
     title: String,
     movies: List<Movie>,
     onLoadMore: () -> Unit,
-    genreMap: Map<String, Int>
+    genreMap: Map<String, Int>,
+    onMovieClick: (Movie) -> Unit = {}
 ) {
     Spacer(modifier = Modifier.height(20.dp))
     Text(
@@ -300,7 +322,7 @@ fun MovieSection(
 
     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         items(movies) { movie ->
-            MovieCard(movie = movie, genreMap = genreMap)
+            MovieCard(movie = movie, genreMap = genreMap, onMovieClick = { onMovieClick(movie) })
         }
 
         item {
@@ -335,7 +357,8 @@ fun HeroCarouselCards(
     peekRightDp: Dp = 50.dp,
     pageSpacing: Dp = 16.dp,
     cardHeight: Dp = 340.dp,
-    cornerRadius: Dp = 24.dp
+    cornerRadius: Dp = 24.dp,
+    onMovieClick: (Movie) -> Unit = {}
 ) {
     if (movies.isEmpty()) return
 
@@ -380,6 +403,7 @@ fun HeroCarouselCards(
                 modifier = Modifier
                     .height(cardHeight)
                     .aspectRatio(2f / 3f)
+                    .clickable { onMovieClick(movie) }
                     .graphicsLayer {
                         scaleX = scale
                         scaleY = scale

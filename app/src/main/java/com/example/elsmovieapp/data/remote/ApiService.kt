@@ -1,7 +1,9 @@
 package com.example.elsmovieapp.data.remote
 
+import com.example.elsmovieapp.data.model.CreditsResponse
 import com.example.elsmovieapp.data.model.MovieResponse
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -30,5 +32,11 @@ interface ApiService {
         @Query("query") query: String,
         @Query("page") page: Int = 1
     ): MovieResponse
+
+    @GET("movie/{movie_id}/credits")
+    suspend fun getMovieCredits(
+        @Path("movie_id") movieId: Int
+    ): CreditsResponse
+
 }
 

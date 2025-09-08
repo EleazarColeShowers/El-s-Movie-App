@@ -19,5 +19,29 @@ data class Movie(
     val video: Boolean,
     val original_language: String,
     val original_title: String,
-    val genre_ids: List<Int>
+    val genre_ids: List<Int>,
+    val runtime: Int? = null,
+    val cast: List<CastMember> = emptyList()
+)
+
+data class CastMember(
+    val id: Int,
+    val name: String,
+    val character: String,
+    val profile_path: String?
+)
+
+
+data class CreditsResponse(
+    val id: Int,
+    val cast: List<CastMember>,
+    val crew: List<CrewMember>
+)
+
+data class CrewMember(
+    val id: Int,
+    val name: String,
+    val job: String,
+    val department: String,
+    val profile_path: String?
 )

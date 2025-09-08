@@ -1,6 +1,7 @@
 package com.example.elsmovieapp.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,12 +29,13 @@ import coil.compose.AsyncImage
 import com.example.elsmovieapp.data.model.Movie
 
 @Composable
-fun MovieCard(movie: Movie,  genreMap: Map<String, Int>) {
+fun MovieCard(movie: Movie,  genreMap: Map<String, Int>,  onMovieClick: (Movie) -> Unit = {} ) {
 
     Column(
         modifier = Modifier
             .width(135.dp)
             .height(231.dp)
+            .clickable { onMovieClick(movie) }
     ) {
         Box(
             modifier = Modifier
