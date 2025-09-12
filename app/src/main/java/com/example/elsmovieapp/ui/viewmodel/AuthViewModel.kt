@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.elsmovieapp.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
 
 class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
@@ -44,6 +45,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
             _username.value = name
         }
     }
+
+    fun logout() {
+        FirebaseAuth.getInstance().signOut()
+        _isLoggedIn.value = false
+    }
+
 }
 
 class AuthViewModelFactory(

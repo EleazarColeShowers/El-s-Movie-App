@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.elsmovieapp.ui.main.HomeActivity
+import com.example.elsmovieapp.ui.profile.Profile
 import com.example.elsmovieapp.ui.search.Search
 import kotlin.jvm.java
 
@@ -45,11 +46,11 @@ fun BottomBar(currentScreen: String) {
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
-                    if (!isSelected) { // avoid relaunching same screen
+                    if (!isSelected) {
                         when (label) {
                             "Home" -> context.startActivity(Intent(context, HomeActivity::class.java))
                             "Search" -> context.startActivity(Intent(context, Search::class.java))
-                            // "Profile" -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                             "Profile" -> context.startActivity(Intent(context, Profile::class.java))
                         }
                     }
                 },

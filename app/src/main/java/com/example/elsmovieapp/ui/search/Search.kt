@@ -1,10 +1,12 @@
 package com.example.elsmovieapp.ui.search
 
+import android.R.attr.onClick
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -155,7 +157,6 @@ fun SearchPage(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // If searching, show results. Otherwise, show Now Playing.
                 if (searchQuery.isNotBlank()) {
                     if (searchResults.isNotEmpty()) {
                         Text(
@@ -166,7 +167,7 @@ fun SearchPage(
                         Spacer(modifier = Modifier.height(12.dp))
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             items(searchResults) { movie ->
-                                NowPlayingCard(movie = movie)
+                                NowPlayingCard(movie = movie) { selectedMovie = movie }
                             }
                         }
                     } else {
@@ -180,7 +181,7 @@ fun SearchPage(
                 } else {
                     val todayMovie = movies.firstOrNull()
                     if (todayMovie != null) {
-                        TodayMovieCard(movie = todayMovie)
+                        TodayMovieCard(movie = todayMovie) { selectedMovie = todayMovie }
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -194,8 +195,7 @@ fun SearchPage(
                         Spacer(modifier = Modifier.height(12.dp))
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             items(movies) { movie ->
-                                NowPlayingCard(movie = movie)
-                            }
+                                NowPlayingCard(movie = movie) { selectedMovie = movie }                             }
                         }
                     }
                 }
@@ -216,11 +216,12 @@ fun SearchPage(
 
 
 @Composable
-fun TodayMovieCard(movie: Movie) {
+fun TodayMovieCard(movie: Movie, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(0.dp),
         colors = CardDefaults.cardColors(
@@ -288,12 +289,13 @@ fun TodayMovieCard(movie: Movie) {
 }
 
 @Composable
-fun NowPlayingCard(movie: Movie) {
+fun NowPlayingCard(movie: Movie, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(135.dp)
             .height(200.dp)
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
     ) {

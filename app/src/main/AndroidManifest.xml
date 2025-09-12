@@ -27,6 +27,7 @@
         <activity android:name=".ui.authUI.LogInActivity"/>
         <activity android:name=".ui.main.HomeActivity"/>
         <activity android:name=".ui.search.Search"/>
+        <activity android:name=".ui.profile.Profile"/>
 
     </application>
 
